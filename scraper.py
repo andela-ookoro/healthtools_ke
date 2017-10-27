@@ -74,6 +74,12 @@ def scrapers():
     nhif_outpatient_result = nhif_outpatient_scraper.run_scraper()
     nhif_outpatient_cs_result = nhif_outpatient_cs_scraper.run_scraper()
 
+    # record end time
+    end_time = time.time()
+    response_time_in_minutes = (end_time - start_time) / (60)
+    if(response_time_in_minutes >= 30):
+        error['MESSAGE'] = 'Scraper: {} took about {} minutes'.format(scraper_id, response_time_in_minutes)
+        scraper.print_error(error)
 
 if __name__ == "__main__":
     import multiprocessing
