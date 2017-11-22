@@ -14,30 +14,25 @@ class ClinicalOfficersScraper(Scraper):
         self.fields = [
             "name", "reg_date", "reg_no", "valid_dates",
             "address", "qualifications", "id",
-            ]
+        ]
+        self.es_doc = "clinical-officers"
+        self.data_key = "clinical_officers.json"
+        self.data_archive_key = "archive/clinical_officers-{}.json"
 
-        self._type = "clinical-officers"
-        self.s3_key = "data/clinical_officers.json"
-        self.s3_historical_record_key = "data/archive/clinical_officers-{}.json"
-
-    def format_for_elasticsearch(self, entry):
+    def elasticsearch_format(self, entry):
         """
         Format entry into elasticsearch ready document
         :param entry: the data to be formatted
         :return: dictionaries of the entry's metadata and the formatted entry
         """
-        try:
-            date_obj = datetime.strptime(entry["reg_date"], "%Y-%m-%d")
-        except:
-            date_obj = datetime.strptime(entry["reg_date"], "%d-%m-%Y")
-        entry["reg_date"] = datetime.strftime(
-            date_obj, "%Y-%m-%dT%H:%M:%S.000Z")
+        date_obj = self.parse_date(entry["reg_date"])
+        entry["reg_date"] = datetime.strftime(date_obj, "%Y-%m-%dT%H:%M:%S.000Z")
         # all bulk data need meta data describing the data
         meta_dict = {
             "index": {
-                "_index": ES["index"],
-                "_type": self._type,
+                "_index": self.es_index,
+                "_type": self.es_doc,
                 "_id": entry["id"]
-                }
             }
+        }
         return meta_dict, entry

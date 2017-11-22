@@ -1,7 +1,7 @@
 from healthtools.scrapers.base_scraper import Scraper
-from healthtools.config import SITES, ES
+from healthtools.config import SITES
 from datetime import datetime
-
+import logging
 
 class DoctorsScraper(Scraper):
     '''
@@ -10,16 +10,15 @@ class DoctorsScraper(Scraper):
 
     def __init__(self):
         super(DoctorsScraper, self).__init__()
+        log = logging.getLogger('__main__')
         self.site_url = SITES["DOCTORS"]
         self.fields = [
             "name", "reg_date", "reg_no", "postal_address", "qualifications",
             "speciality", "sub_speciality", "id",
         ]
-
-        self._type = "doctors"
-        self.s3_key = "data/doctors.json"
-        self.s3_historical_record_key = "data/archive/doctors-{}.json"
-        self.doctor_type = "local_doctor"
+        self.es_doc = "doctors"
+        self.data_key = "doctors.json"
+        self.data_archive_key = "archive/doctors-{}.json"
 
     def format_for_elasticsearch(self, entry):
         """
@@ -38,8 +37,8 @@ class DoctorsScraper(Scraper):
         # all bulk data need meta data describing the data
         meta_dict = {
             "index": {
-                "_index": ES["index"],
-                "_type": self._type,
+                "_index": self.es_index,
+                "_type": self.es_doc,
                 "_id": entry["id"]
             }
         }
