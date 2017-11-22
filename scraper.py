@@ -2,11 +2,8 @@ import json
 from time import time, gmtime, strftime
 import logging
 import logging.config
-<<<<<<< HEAD
 import random
 import os
-=======
->>>>>>> b3697af9fbc641598bd5d6fb79d6721231095e36
 
 from healthtools.scrapers.doctors import DoctorsScraper
 from healthtools.scrapers.base_scraper import Scraper
